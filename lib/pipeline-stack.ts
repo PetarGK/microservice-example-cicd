@@ -4,6 +4,7 @@ import { GitHubSourceAction, GitHubTrigger, CodeBuildAction, CloudFormationCreat
 import { StringParameter } from '@aws-cdk/aws-ssm'
 import { SecretValue } from '@aws-cdk/core';
 import { PipelineProject, LinuxBuildImage, BuildSpec } from '@aws-cdk/aws-codebuild';
+import { Role, ServicePrincipal, ManagedPolicy } from '@aws-cdk/aws-iam';
 
 export class PipelineStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -35,11 +36,17 @@ export class PipelineStack extends cdk.Stack {
       actions: [sourceAction]
     })
 
+    const serviceRole = new Role(this, 'CodeBuildServiceRole', {
+      assumedBy: new ServicePrincipal('codebuild.amazonaws.com'),
+      managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName("AdministratorAccess")]
+    })
+
     const cdkBuildOutput = new Artifact('CdkBuildOutput');
     const cdkBuild = new PipelineProject(this, 'CdkBuild', {
       environment: {
         buildImage: LinuxBuildImage.UBUNTU_14_04_NODEJS_10_14_1
       },
+      role: serviceRole,
       buildSpec: BuildSpec.fromObject({
         version: '0.2',
         phases: {
@@ -60,7 +67,7 @@ export class PipelineStack extends cdk.Stack {
       stageName: 'Deploy',
       actions: [
         new CodeBuildAction({
-          actionName: 'CDK_Build',
+          actionName: 'CodeDeploy',
           project: cdkBuild,
           input: sourceOutput,
           outputs: [cdkBuildOutput]

@@ -13,6 +13,8 @@ export class LambdaStack extends cdk.Stack {
       memorySize: 512,
       minify: true
     });
+
+    /*
     const getTodosVersion = getTodosLambda.addVersion(new Date().toISOString());
     const getTodosAlias = new Alias(this, 'getTodosAlias', {
       aliasName: 'Prod',
@@ -23,6 +25,6 @@ export class LambdaStack extends cdk.Stack {
       alias: getTodosAlias,
       deploymentConfig: LambdaDeploymentConfig.LINEAR_10PERCENT_EVERY_1MINUTE,
     });
-
+*/
   }
 }
