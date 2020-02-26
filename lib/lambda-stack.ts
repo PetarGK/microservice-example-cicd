@@ -44,9 +44,33 @@ export class LambdaStack extends cdk.Stack {
     const getTodosIntegration = new LambdaIntegration(getTodosLambda)
     const addTodoIntegration = new LambdaIntegration(addTodoLambda)
 
-    const getTodosMethod = todos.addMethod('GET', getTodosIntegration)
-    const addTodoMethod = todos.addMethod('POST', addTodoIntegration)
+    const getTodosMethod = todos.addMethod('GET', getTodosIntegration, { apiKeyRequired: true })
+    const addTodoMethod = todos.addMethod('POST', addTodoIntegration, { apiKeyRequired: true })
 
-
+    const key = api.addApiKey('ApiKey');
+    const plan = api.addUsagePlan('UsagePlan', {
+      name: 'Easy',
+      apiKey: key
+    });
+    
+    plan.addApiStage({
+      stage: api.deploymentStage,
+      throttle: [
+        {
+          method: getTodosMethod,
+          throttle: {
+            rateLimit: 10,
+            burstLimit: 2
+          }
+        },
+        {
+          method: addTodoMethod,
+          throttle: {
+            rateLimit: 10,
+            burstLimit: 2
+          }
+        },        
+      ]
+    });
   }
 }
