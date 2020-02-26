@@ -9,6 +9,14 @@ export class LambdaStack extends cdk.Stack {
 
    
     const getTodosLambda = new NodejsFunction(this, 'get-todos', {
+      entry: 'lib/lambda-stack/get-todos.ts',
+      runtime: Runtime.NODEJS_12_X,
+      memorySize: 512,
+      minify: true
+    });
+
+    const addTodoLambda = new NodejsFunction(this, 'add-todo', {
+      entry: 'lib/lambda-stack/add-todo.ts',
       runtime: Runtime.NODEJS_12_X,
       memorySize: 512,
       minify: true
