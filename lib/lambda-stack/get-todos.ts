@@ -1,5 +1,5 @@
 export async function handler(): Promise<any> {
-    return [
+    const result = [
         {
             id: 1,
             name: "Test",
@@ -25,4 +25,14 @@ export async function handler(): Promise<any> {
             priority: 4
         },                    
     ]
+
+    return {
+        statusCode: 200,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": true,
+            "Cache-Control": "no-cache"
+        },
+        body: JSON.stringify(result)
+    };
 }
