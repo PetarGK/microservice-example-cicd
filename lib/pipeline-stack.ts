@@ -45,28 +45,19 @@ export class PipelineStack extends cdk.Stack {
         phases: {
             install: {
               commands: [
+                'npm install -g aws-cdk',
                 'npm install'
               ]
             },
             build: {
-              commands: [
-                'npm run build',
-                'npm run cdk synth \'*\' -- -o dist'
-              ]
-            },
-            artifacts: {
-              'base-directory': 'dist',
-              files: [
-                'LambdaStack.template.json',
-              ],
-            },            
-        }
+              commands: 'cdk --app "npx ts-node bin/microservice-example-app.ts" --require-approval=never deploy "*"'
+            }
+        }      
       })
     })
 
-
     pipeline.addStage({
-      stageName: 'Build',
+      stageName: 'Deploy',
       actions: [
         new CodeBuildAction({
           actionName: 'CDK_Build',
@@ -75,18 +66,6 @@ export class PipelineStack extends cdk.Stack {
           outputs: [cdkBuildOutput]
         })
       ]
-    })   
-
-    const deployAction = new CloudFormationCreateUpdateStackAction({
-      actionName: 'CodeDeploy',
-      templatePath: cdkBuildOutput.atPath('LambdaStack.template.json'),
-      stackName: 'LambdaDeploymentStack',
-      adminPermissions: true 
-    })
-
-    pipeline.addStage({
-      stageName: 'Deploy',
-      actions: [deployAction]
-    })     
+    })      
   }
 }

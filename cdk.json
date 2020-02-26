@@ -1,3 +1,3 @@
 {
-  "app": "npx ts-node bin/microservice-example-cicd.ts"
+  "app": "npx ts-node bin/microservice-example-app.ts"
 }
