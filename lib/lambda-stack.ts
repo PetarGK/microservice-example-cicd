@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs'
 import { Runtime, Alias } from '@aws-cdk/aws-lambda';
 import { LambdaDeploymentGroup, LambdaDeploymentConfig } from '@aws-cdk/aws-codedeploy';
+import { RestApi, LambdaIntegration } from '@aws-cdk/aws-apigateway'
 
 export class LambdaStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -34,5 +35,18 @@ export class LambdaStack extends cdk.Stack {
       deploymentConfig: LambdaDeploymentConfig.LINEAR_10PERCENT_EVERY_1MINUTE,
     });
 */
+
+
+    const api = new RestApi(this, 'example-api', { })
+    const v1 = api.root.addResource('v1')
+
+    const todos = v1.addResource('todos')
+    const getTodosIntegration = new LambdaIntegration(getTodosLambda)
+    const addTodoIntegration = new LambdaIntegration(addTodoLambda)
+
+    const getTodosMethod = todos.addMethod('GET', getTodosIntegration)
+    const addTodoMethod = todos.addMethod('POST', addTodoIntegration)
+
+
   }
 }
