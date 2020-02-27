@@ -50,7 +50,11 @@ export class LambdaStack extends cdk.Stack {
     const key = api.addApiKey('ApiKey');
     const plan = api.addUsagePlan('UsagePlan', {
       name: 'Easy',
-      apiKey: key
+      apiKey: key,
+      throttle: {
+        rateLimit: 10,
+        burstLimit: 2
+      }
     });
     
     plan.addApiStage({
